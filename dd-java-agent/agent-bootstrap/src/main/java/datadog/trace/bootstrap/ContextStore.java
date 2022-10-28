@@ -18,7 +18,9 @@ public interface ContextStore<K, C> {
    */
   interface Factory<C> {
 
-    /** @return new context instance */
+    /**
+     * @return new context instance
+     */
     C create();
   }
 

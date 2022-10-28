@@ -1,7 +1,9 @@
 package datadog.trace.instrumentation.tomcat;
 
+import datadog.appsec.api.blocking.BlockingContentType;
 import datadog.trace.api.Config;
 import datadog.trace.api.DDTags;
+import datadog.trace.api.gateway.BlockResponseFunction;
 import datadog.trace.bootstrap.instrumentation.api.AgentPropagation;
 import datadog.trace.bootstrap.instrumentation.api.AgentSpan;
 import datadog.trace.bootstrap.instrumentation.api.URIDataAdapter;
@@ -110,5 +112,24 @@ public class TomcatDecorator
       onError(span, (Throwable) throwable);
     }
     return super.onResponse(span, response);
+  }
+
+  @Override
+  protected BlockResponseFunction createBlockResponseFunction(final Request request) {
+    return new TomcatBlockResponseFunction(request);
+  }
+
+  private static class TomcatBlockResponseFunction implements BlockResponseFunction {
+    private final Request request;
+
+    public TomcatBlockResponseFunction(Request request) {
+      this.request = request;
+    }
+
+    @Override
+    public boolean tryCommitBlockingResponse(int statusCode, BlockingContentType bct) {
+      return TomcatBlockingHelper.commitBlockingResponse(
+          request, request.getResponse(), statusCode, bct);
+    }
   }
 }

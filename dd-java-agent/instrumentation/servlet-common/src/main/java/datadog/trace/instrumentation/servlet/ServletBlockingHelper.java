@@ -2,7 +2,6 @@ package datadog.trace.instrumentation.servlet;
 
 import datadog.trace.api.gateway.Flow;
 import datadog.trace.bootstrap.blocking.BlockingActionHelper;
-import datadog.trace.bootstrap.blocking.BlockingActionHelper.TemplateType;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +22,7 @@ public class ServletBlockingHelper {
     }
 
     String acceptHeader = httpServletRequest.getHeader("Accept");
-    TemplateType type =
+    BlockingActionHelper.TemplateType type =
         BlockingActionHelper.determineTemplateType(rba.getBlockingContentType(), acceptHeader);
     byte[] template = BlockingActionHelper.getTemplate(type);
     String contentType = BlockingActionHelper.getContentType(type);

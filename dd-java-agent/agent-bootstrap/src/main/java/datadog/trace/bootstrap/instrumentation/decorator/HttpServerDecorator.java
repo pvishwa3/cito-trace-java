@@ -9,6 +9,7 @@ import datadog.trace.api.Config;
 import datadog.trace.api.DDTags;
 import datadog.trace.api.function.TriConsumer;
 import datadog.trace.api.function.TriFunction;
+import datadog.trace.api.gateway.BlockResponseFunction;
 import datadog.trace.api.gateway.CallbackProvider;
 import datadog.trace.api.gateway.Flow;
 import datadog.trace.api.gateway.IGSpanInfo;
@@ -135,6 +136,14 @@ public abstract class HttpServerDecorator<REQUEST, CONNECTION, RESPONSE, REQUEST
         config.isClientIpEnabled()
             || traceClientIpResolverEnabled && ActiveSubsystems.APPSEC_ACTIVE;
 
+    RequestContext requestContext = span.getRequestContext();
+    if (requestContext != null) {
+      BlockResponseFunction brf = createBlockResponseFunction(request);
+      if (brf != null) {
+        requestContext.setBlockResponseFunction(brf);
+      }
+    }
+
     if (context != null) {
       if (clientIpResolverEnabled) {
         String forwarded = context.getForwarded();
@@ -247,6 +256,10 @@ public abstract class HttpServerDecorator<REQUEST, CONNECTION, RESPONSE, REQUEST
     }
 
     return span;
+  }
+
+  protected BlockResponseFunction createBlockResponseFunction(REQUEST request) {
+    return null;
   }
 
   public AgentSpan onResponse(final AgentSpan span, final RESPONSE response) {

@@ -48,24 +48,29 @@ public class JettyBlockingHelper {
 
   private JettyBlockingHelper() {}
 
-  public static void block(
+  public static boolean block(
       Request request, Response response, Flow.Action.RequestBlockingAction rba) {
-    if (GET_OUTPUT_STREAM != null && CLOSE_OUTPUT != null && !response.isCommitted()) {
-      try {
-        OutputStream os = (OutputStream) GET_OUTPUT_STREAM.invoke(response);
-        response.setStatus(BlockingActionHelper.getHttpCode(rba.getStatusCode()));
-        String acceptHeader = request.getHeader("Accept");
-        BlockingActionHelper.TemplateType type =
-            BlockingActionHelper.determineTemplateType(rba.getBlockingContentType(), acceptHeader);
-        response.setHeader("Content-type", BlockingActionHelper.getContentType(type));
-        byte[] template = BlockingActionHelper.getTemplate(type);
-        response.setHeader("Content-length", Integer.toString(template.length));
-        os.write(template);
-        os.close();
-        CLOSE_OUTPUT.invoke(response);
-      } catch (Throwable e) {
-        log.info("Error committing blocking response", e);
-      }
+    if (GET_OUTPUT_STREAM == null || CLOSE_OUTPUT == null) {
+      return false;
     }
+    if (response.isCommitted()) {
+      return true;
+    }
+    try {
+      OutputStream os = (OutputStream) GET_OUTPUT_STREAM.invoke(response);
+      response.setStatus(BlockingActionHelper.getHttpCode(rba.getStatusCode()));
+      String acceptHeader = request.getHeader("Accept");
+      BlockingActionHelper.TemplateType type =
+          BlockingActionHelper.determineTemplateType(rba.getBlockingContentType(), acceptHeader);
+      response.setHeader("Content-type", BlockingActionHelper.getContentType(type));
+      byte[] template = BlockingActionHelper.getTemplate(type);
+      response.setHeader("Content-length", Integer.toString(template.length));
+      os.write(template);
+      os.close();
+      CLOSE_OUTPUT.invoke(response);
+    } catch (Throwable e) {
+      log.info("Error committing blocking response", e);
+    }
+    return true;
   }
 }

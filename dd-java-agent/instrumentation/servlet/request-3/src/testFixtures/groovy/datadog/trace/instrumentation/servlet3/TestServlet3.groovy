@@ -1,5 +1,6 @@
 package datadog.trace.instrumentation.servlet3
 
+import datadog.appsec.api.blocking.Blocking
 import datadog.trace.agent.test.base.HttpServerTest
 import groovy.servlet.AbstractHttpServlet
 
@@ -26,6 +27,7 @@ import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.REDIRE
 import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.SUCCESS
 import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.TIMEOUT
 import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.TIMEOUT_ERROR
+import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.USER_BLOCK
 
 class TestServlet3 {
 
@@ -103,6 +105,9 @@ class TestServlet3 {
             break
           case EXCEPTION:
             throw new Exception(endpoint.body)
+          case USER_BLOCK:
+            Blocking.forUser('user-to-block').blockIfMatch()
+            break
           case CUSTOM_EXCEPTION:
             throw new InputMismatchException(endpoint.body)
         }
