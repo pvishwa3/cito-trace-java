@@ -42,7 +42,9 @@ import static datadog.trace.api.ConfigDefaults.DEFAULT_IAST_MAX_CONCURRENT_REQUE
 import static datadog.trace.api.ConfigDefaults.DEFAULT_IAST_REQUEST_SAMPLING;
 import static datadog.trace.api.ConfigDefaults.DEFAULT_IAST_VULNERABILITIES_PER_REQUEST;
 import static datadog.trace.api.ConfigDefaults.DEFAULT_IAST_WEAK_CIPHER_ALGORITHMS;
+import static datadog.trace.api.ConfigDefaults.DEFAULT_IAST_WEAK_CIPHER_ENABLED;
 import static datadog.trace.api.ConfigDefaults.DEFAULT_IAST_WEAK_HASH_ALGORITHMS;
+import static datadog.trace.api.ConfigDefaults.DEFAULT_IAST_WEAK_HASH_ENABLED;
 import static datadog.trace.api.ConfigDefaults.DEFAULT_JMX_FETCH_ENABLED;
 import static datadog.trace.api.ConfigDefaults.DEFAULT_JMX_FETCH_MULTIPLE_RUNTIME_SERVICES_ENABLED;
 import static datadog.trace.api.ConfigDefaults.DEFAULT_JMX_FETCH_MULTIPLE_RUNTIME_SERVICES_LIMIT;
@@ -147,7 +149,9 @@ import static datadog.trace.api.config.IastConfig.IAST_MAX_CONCURRENT_REQUESTS;
 import static datadog.trace.api.config.IastConfig.IAST_REQUEST_SAMPLING;
 import static datadog.trace.api.config.IastConfig.IAST_VULNERABILITIES_PER_REQUEST;
 import static datadog.trace.api.config.IastConfig.IAST_WEAK_CIPHER_ALGORITHMS;
+import static datadog.trace.api.config.IastConfig.IAST_WEAK_CIPHER_ENABLED;
 import static datadog.trace.api.config.IastConfig.IAST_WEAK_HASH_ALGORITHMS;
+import static datadog.trace.api.config.IastConfig.IAST_WEAK_HASH_ENABLED;
 import static datadog.trace.api.config.JmxFetchConfig.JMX_FETCH_CHECK_PERIOD;
 import static datadog.trace.api.config.JmxFetchConfig.JMX_FETCH_CONFIG;
 import static datadog.trace.api.config.JmxFetchConfig.JMX_FETCH_CONFIG_DIR;
@@ -592,6 +596,8 @@ public class Config {
   private final Pattern iastWeakCipherAlgorithms;
 
   private final boolean iastDeduplicationEnabled;
+  private final boolean iastWeakHashEnabled;
+  private final boolean iastWeakCipherEnabled;
 
   private final int telemetryHeartbeatInterval;
 
@@ -1093,6 +1099,11 @@ public class Config {
     iastDeduplicationEnabled =
         configProvider.getBoolean(IAST_DEDUPLICATION_ENABLED, DEFAULT_IAST_DEDUPLICATION_ENABLED);
 
+    iastWeakCipherEnabled =
+        configProvider.getBoolean(IAST_WEAK_CIPHER_ENABLED, DEFAULT_IAST_WEAK_CIPHER_ENABLED);
+    iastWeakHashEnabled =
+        configProvider.getBoolean(IAST_WEAK_HASH_ENABLED, DEFAULT_IAST_WEAK_HASH_ENABLED);
+
     ciVisibilityAgentlessEnabled =
         configProvider.getBoolean(
             CIVISIBILITY_AGENTLESS_ENABLED, DEFAULT_CIVISIBILITY_AGENTLESS_ENABLED);
@@ -1377,6 +1388,14 @@ public class Config {
 
   public boolean isIastDeduplicationEnabled() {
     return iastDeduplicationEnabled;
+  }
+
+  public boolean isIastWeakHashEnabled() {
+    return iastWeakHashEnabled;
+  }
+
+  public boolean isIastWeakCipherEnabled() {
+    return iastWeakCipherEnabled;
   }
 
   public Map<String, String> getServiceMapping() {
@@ -2986,6 +3005,12 @@ public class Config {
         + cwsEnabled
         + ", cwsTlsRefresh="
         + cwsTlsRefresh
+        + ", iastDeduplicationEnabled="
+        + iastDeduplicationEnabled
+        + ", iastWeakHashEnabled="
+        + iastWeakHashEnabled
+        + ", iastWeakCipherEnabled="
+        + iastWeakCipherEnabled
         + '}';
   }
 }
