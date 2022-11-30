@@ -3,6 +3,7 @@ import datadog.trace.api.Platform
 import datadog.trace.bootstrap.instrumentation.api.InstrumentationTags
 import datadog.trace.bootstrap.instrumentation.api.Tags
 import datadog.trace.core.datastreams.StatsGroup
+import datadog.trace.test.util.Flaky
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -28,6 +29,7 @@ import spock.lang.Shared
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
+@Flaky("https://github.com/DataDog/dd-trace-java/issues/3865")
 @Retry(count = 5, mode = Retry.Mode.SETUP_FEATURE_CLEANUP)
 class KafkaStreamsTest extends AgentTestRunner {
   static final STREAM_PENDING = "test.pending"

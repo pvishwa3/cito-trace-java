@@ -1,6 +1,7 @@
 import datadog.trace.agent.test.AgentTestRunner
 import datadog.trace.api.DDSpanTypes
 import datadog.trace.bootstrap.instrumentation.api.Tags
+import datadog.trace.test.util.Flaky
 import groovy.json.JsonSlurper
 import org.apache.http.HttpHost
 import org.apache.http.client.config.RequestConfig
@@ -21,6 +22,7 @@ import spock.lang.Shared
 
 import static org.elasticsearch.cluster.ClusterName.CLUSTER_NAME_SETTING
 
+@Flaky
 @Retry(count = 3, delay = 1000, mode = Retry.Mode.SETUP_FEATURE_CLEANUP)
 class Elasticsearch5RestClientTest extends AgentTestRunner {
   @Shared

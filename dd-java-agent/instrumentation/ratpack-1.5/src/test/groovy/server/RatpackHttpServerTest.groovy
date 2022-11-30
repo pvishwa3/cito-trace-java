@@ -9,12 +9,14 @@ import datadog.trace.api.DDTags
 import datadog.trace.bootstrap.instrumentation.api.Tags
 import datadog.trace.instrumentation.netty41.server.NettyHttpServerDecorator
 import datadog.trace.instrumentation.ratpack.RatpackServerDecorator
+import datadog.trace.test.util.Flaky
 import ratpack.error.ServerErrorHandler
 import ratpack.form.Form
 import ratpack.groovy.test.embed.GroovyEmbeddedApp
 import ratpack.handling.Context
 import ratpack.handling.HandlerDecorator
 import ratpack.test.embed.EmbeddedApp
+import spock.lang.Retry
 
 import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.BODY_JSON
 import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.BODY_URLENCODED
@@ -29,6 +31,8 @@ import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.QUERY_
 import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.REDIRECT
 import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.SUCCESS
 
+@Flaky
+@Retry
 class RatpackHttpServerTest extends HttpServerTest<EmbeddedApp> {
 
   @Override

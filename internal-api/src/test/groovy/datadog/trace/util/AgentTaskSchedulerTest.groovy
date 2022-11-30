@@ -12,7 +12,6 @@ import static datadog.trace.util.AgentThreadFactory.AgentThread.TASK_SCHEDULER
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 import static java.util.concurrent.TimeUnit.SECONDS
 
-@Retry
 class AgentTaskSchedulerTest extends DDSpecification {
 
   AgentTaskScheduler scheduler
@@ -46,6 +45,8 @@ class AgentTaskSchedulerTest extends DDSpecification {
     latch.await(500, MILLISECONDS)
   }
 
+  //@Flaky("awaitGC is flaky")
+  @Retry
   def "test weak scheduling"() {
     setup:
     def latch = new CountDownLatch(Integer.MAX_VALUE)

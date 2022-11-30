@@ -156,6 +156,7 @@ class FieldInjectionForkedTest extends AgentTestRunner {
     noExceptionThrown()
   }
 
+  //@Flaky("awaitGC is flaky")
   @Retry
   def "backing map should not create strong refs to key class instances #keyValue.get().getClass().getName()"() {
     when:

@@ -47,6 +47,7 @@ import org.openjdk.jmc.common.item.ItemFilters;
 import org.openjdk.jmc.common.unit.IQuantity;
 import org.openjdk.jmc.flightrecorder.JfrLoaderToolkit;
 import org.openjdk.jmc.flightrecorder.jdk.JdkAttributes;
+import spock.lang.Retry;
 
 @DisabledOnJ9
 public final class CodeHotspotsTest {
@@ -186,6 +187,8 @@ public final class CodeHotspotsTest {
 
   @Test
   @DisplayName("Test saturated parallel processing")
+  // @Flaky
+  @Retry
   void testSaturatedFanout() throws Exception {
     System.out.println("Test saturated parallel processing");
     int meanServiceTimeSecs = 1; // seconds
@@ -244,6 +247,8 @@ public final class CodeHotspotsTest {
         .forEach(CodeHotspotsTest::hasCpuEvents);
   }
 
+  // @Flaky
+  @Retry
   @ParameterizedTest
   @ValueSource(ints = {128})
   void testGenerativeStackTraces(int depth) throws Exception {
@@ -256,6 +261,8 @@ public final class CodeHotspotsTest {
     runTestGenerativeStackTraces("MethodHandles", depth);
   }
 
+  // @Flaky
+  @Retry
   @ParameterizedTest
   @ValueSource(ints = {128})
   void testGenerativeStackTracesWithCapturingLambdas(int depth) throws Exception {

@@ -16,6 +16,7 @@
 
 
 import datadog.trace.agent.test.AgentTestRunner
+import datadog.trace.test.util.Flaky
 import listener.Config
 import org.apache.activemq.junit.EmbeddedActiveMQBroker
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
@@ -27,6 +28,7 @@ import javax.jms.ConnectionFactory
 import static JMS1Test.consumerTrace
 import static JMS1Test.producerTrace
 
+@Flaky
 @Retry
 class SpringListenerJMS1Test extends AgentTestRunner {
 

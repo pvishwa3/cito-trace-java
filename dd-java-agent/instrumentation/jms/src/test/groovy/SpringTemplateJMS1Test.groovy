@@ -1,4 +1,5 @@
 import datadog.trace.agent.test.AgentTestRunner
+import datadog.trace.test.util.Flaky
 import org.apache.activemq.ActiveMQConnectionFactory
 import org.apache.activemq.junit.EmbeddedActiveMQBroker
 import org.springframework.jms.core.JmsTemplate
@@ -13,7 +14,6 @@ import java.util.concurrent.TimeUnit
 import static JMS1Test.consumerTrace
 import static JMS1Test.producerTrace
 
-@Retry
 class SpringTemplateJMS1Test extends AgentTestRunner {
   @Shared
   EmbeddedActiveMQBroker broker = new EmbeddedActiveMQBroker()
@@ -58,6 +58,8 @@ class SpringTemplateJMS1Test extends AgentTestRunner {
     messageText = "a message"
   }
 
+  @Flaky("Sometimes fails when finding errors in traces: Cannot publish to a deleted Destination: temp-queue://...")
+  @Retry
   def "send and receive message generates spans"() {
     setup:
     Thread.start {

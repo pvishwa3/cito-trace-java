@@ -1,6 +1,7 @@
 import datadog.trace.agent.test.base.HttpClientTest
 import datadog.trace.bootstrap.instrumentation.api.Tags
 import datadog.trace.instrumentation.netty41.client.NettyHttpClientDecorator
+import datadog.trace.test.util.Flaky
 import io.netty.channel.AbstractChannel
 import io.netty.handler.ssl.SslContextBuilder
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory
@@ -21,6 +22,7 @@ import static datadog.trace.agent.test.utils.TraceUtils.basicSpan
 import static datadog.trace.agent.test.utils.TraceUtils.runUnderTrace
 import static org.asynchttpclient.Dsl.asyncHttpClient
 
+@Flaky
 @Retry
 @Timeout(5)
 class Netty41ClientTest extends HttpClientTest {

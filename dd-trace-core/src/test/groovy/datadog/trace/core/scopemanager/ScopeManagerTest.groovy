@@ -211,6 +211,7 @@ class ScopeManagerTest extends DDCoreSpecification {
     concurrent << [false, true]
   }
 
+  // @Flaky("awaitGC is flaky")
   @Retry
   def "test continuation doesn't have hard reference on scope"() {
     when:

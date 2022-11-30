@@ -17,6 +17,7 @@ import static datadog.trace.test.util.GCUtils.awaitGC
 class HelperInjectionTest extends DDSpecification {
   static final String HELPER_CLASS_NAME = 'datadog.trace.agent.test.HelperClass'
 
+  //@Flaky("awaitGC usage is flaky")
   @Retry
   def "helpers injected to non-delegating classloader"() {
     setup:
@@ -47,6 +48,7 @@ class HelperInjectionTest extends DDSpecification {
     null == ref.get()
   }
 
+  //@Flaky("awaitGC usage is flaky")
   @Retry
   def "check hard references on class injection"() {
     setup:
