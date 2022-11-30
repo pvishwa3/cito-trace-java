@@ -15,7 +15,19 @@ def testTimeoutDuration = Duration.of(9, ChronoUnit.MINUTES)
 // Go through the Test tasks and configure them
 tasks.withType(Test).configureEach {
   if (project.findProperty("enableJunitPlatform") == true) {
-    useJUnitPlatform()
+    useJUnitPlatform {
+      if (project.rootProject.hasProperty("skipFlakyTests")) {
+        excludeTags "flaky"
+      } else if (project.rootProject.hasProperty("runFlakyTests")) {
+        includeTags "flaky"
+      }
+    }
+  }
+
+  if (project.rootProject.hasProperty("skipFlakyTests")) {
+    jvmArgs += ["-Drun.flaky.tests=false"]
+  } else if (project.rootProject.hasProperty("runFlakyTests")) {
+    jvmArgs += ["-Drun.flaky.tests=true"]
   }
 
   // All tests must complete within 15 minutes.
