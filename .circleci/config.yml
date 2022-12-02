@@ -358,6 +358,9 @@ jobs:
       gradleTarget:
         type: string
         default: ""
+      gradleExtra:
+        type: string
+        default: ""
       triggeredBy:
         type: string
         default: ".*"
@@ -370,8 +373,6 @@ jobs:
       profile:
         type: boolean
         default: false
-
-
 
     steps:
       - setup_code
@@ -390,6 +391,7 @@ jobs:
             or:
               - equal: ["smoke", << parameters.stage >>]
               - equal: ["instrumentation", << parameters.stage >>]
+              - equal: ["flaky", << parameters.stage >>]
           steps:
             - setup_testcontainers
 
@@ -408,6 +410,7 @@ jobs:
             << pipeline.parameters.gradle_flags >>
             --max-workers=<< parameters.maxWorkers >>
             --continue
+            << parameters.gradleExtra >>
 
       - run:
           name: Collect reports
@@ -717,8 +720,9 @@ build_test_jobs: &build_test_jobs
         - build
       name: z_test_8_flaky
       gradleParameters: "-PrunFlakyTests"
+      gradleExtra: " || true"
       triggeredBy: *core_modules
-      stage: instrumentation
+      stage: flaky
       maxWorkers: 4
       testJvm: "8"
 
