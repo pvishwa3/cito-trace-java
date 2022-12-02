@@ -3,7 +3,6 @@ import datadog.trace.test.util.Flaky
 import org.apache.activemq.ActiveMQConnectionFactory
 import org.apache.activemq.junit.EmbeddedActiveMQBroker
 import org.springframework.jms.core.JmsTemplate
-import spock.lang.Retry
 import spock.lang.Shared
 
 import javax.jms.Connection
@@ -59,7 +58,6 @@ class SpringTemplateJMS1Test extends AgentTestRunner {
   }
 
   @Flaky("Sometimes fails when finding errors in traces: Cannot publish to a deleted Destination: temp-queue://...")
-  @Retry
   def "send and receive message generates spans"() {
     setup:
     Thread.start {

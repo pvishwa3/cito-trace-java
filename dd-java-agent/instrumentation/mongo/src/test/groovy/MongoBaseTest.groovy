@@ -10,7 +10,6 @@ import de.flapdoodle.embed.mongo.config.Net
 import de.flapdoodle.embed.mongo.distribution.Version
 import de.flapdoodle.embed.process.runtime.Network
 import org.apache.commons.io.FileUtils
-import spock.lang.Retry
 import spock.lang.Shared
 import spock.util.concurrent.PollingConditions
 
@@ -22,7 +21,6 @@ import java.nio.file.StandardOpenOption
  */
 @Flaky("Fails sometimes with java.io.IOException https://github.com/DataDog/dd-trace-java/issues/3884")
 @SuppressWarnings('UnnecessaryDotClass')
-@Retry(count = 3, exceptions = IOException.class)
 class MongoBaseTest extends AgentTestRunner {
 
   @Shared

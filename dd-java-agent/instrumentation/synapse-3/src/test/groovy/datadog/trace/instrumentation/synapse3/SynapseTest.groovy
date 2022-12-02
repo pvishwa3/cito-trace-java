@@ -24,15 +24,12 @@ import org.apache.synapse.ServerConfigurationInformation
 import org.apache.synapse.ServerContextInformation
 import org.apache.synapse.ServerManager
 import org.apache.synapse.transport.passthru.PassThroughHttpListener
-import spock.lang.Retry
 import spock.lang.Shared
 
 import java.lang.reflect.Field
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 
 @Flaky("Occasionally times out when receiving traces")
-@Retry(exceptions = [TimeoutException])
 class SynapseTest extends AgentTestRunner {
 
   String expectedServiceName() {

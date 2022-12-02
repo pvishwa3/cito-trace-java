@@ -7,7 +7,6 @@ import datadog.trace.bootstrap.instrumentation.api.Tags
 import datadog.trace.instrumentation.netty38.client.NettyHttpClientDecorator
 import datadog.trace.test.util.Flaky
 import spock.lang.AutoCleanup
-import spock.lang.Retry
 import spock.lang.Shared
 
 import java.util.concurrent.ExecutionException
@@ -75,7 +74,6 @@ class Netty38ClientTest extends HttpClientTest {
     return false
   }
   @Flaky("Fails sometimes with Condition not satisfied https://github.com/DataDog/dd-trace-java/issues/3886")
-  @Retry
   def "connection error (unopened port)"() {
     given:
     def uri = new URI("http://localhost:$UNUSABLE_PORT/")

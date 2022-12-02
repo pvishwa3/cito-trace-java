@@ -16,7 +16,6 @@ import ratpack.groovy.test.embed.GroovyEmbeddedApp
 import ratpack.handling.Context
 import ratpack.handling.HandlerDecorator
 import ratpack.test.embed.EmbeddedApp
-import spock.lang.Retry
 
 import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.BODY_JSON
 import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.BODY_URLENCODED
@@ -32,7 +31,6 @@ import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.REDIRE
 import static datadog.trace.agent.test.base.HttpServerTest.ServerEndpoint.SUCCESS
 
 @Flaky
-@Retry
 class RatpackHttpServerTest extends HttpServerTest<EmbeddedApp> {
 
   @Override

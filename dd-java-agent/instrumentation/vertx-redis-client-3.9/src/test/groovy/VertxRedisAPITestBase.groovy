@@ -4,7 +4,6 @@ import io.vertx.core.Handler
 import io.vertx.redis.client.RedisAPI
 import io.vertx.redis.client.Response
 import spock.lang.AutoCleanup
-import spock.lang.Retry
 import spock.lang.Shared
 
 import java.util.concurrent.CountDownLatch
@@ -137,7 +136,6 @@ abstract class VertxRedisAPITestBase extends VertxRedisTestBase {
 }
 
 @Flaky("linsert is flaky https://github.com/DataDog/dd-trace-java/issues/3874")
-@Retry
 class VertxRedisAPIRedisForkedTest extends VertxRedisAPITestBase {
   def setupSpec() {
     redisAPI = RedisAPI.api(redis)

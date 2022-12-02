@@ -19,11 +19,9 @@ import org.elasticsearch.node.InternalSettingsPreparer
 import org.elasticsearch.node.Node
 import org.elasticsearch.plugins.Plugin
 import org.elasticsearch.transport.Netty4Plugin
-import spock.lang.Retry
 import spock.lang.Shared
 
 @Flaky
-@Retry(count = 3, delay = 1000, mode = Retry.Mode.SETUP_FEATURE_CLEANUP)
 class Elasticsearch6RestClientTest extends AgentTestRunner {
 
   @Shared

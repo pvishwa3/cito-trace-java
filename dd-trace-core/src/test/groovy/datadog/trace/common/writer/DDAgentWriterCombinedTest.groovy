@@ -24,7 +24,6 @@ import datadog.trace.core.propagation.DatadogTags
 import datadog.trace.core.test.DDCoreSpecification
 import datadog.trace.test.util.Flaky
 import okhttp3.HttpUrl
-import spock.lang.Retry
 import spock.lang.Timeout
 import spock.util.concurrent.PollingConditions
 
@@ -456,7 +455,6 @@ class DDAgentWriterCombinedTest extends DDCoreSpecification {
   }
 
   @Flaky("If execution is too slow, the http client timeout may trigger")
-  @Retry(delay = 500)
   def "slow response test"() {
     def numWritten = 0
     def numFlushes = new AtomicInteger(0)

@@ -3,7 +3,6 @@ package datadog.trace.agent.tooling
 import datadog.trace.test.util.Flaky
 import datadog.trace.test.util.GCUtils
 import datadog.trace.test.util.DDSpecification
-import spock.lang.Retry
 
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
@@ -37,7 +36,6 @@ class WeakMapTest extends DDSpecification {
   }
 
   //@Flaky("awaitGC usage is flaky")
-  @Retry
   def "Unreferenced map gets cleaned up"() {
     setup:
     def map = WeakMaps.newWeakMap()
@@ -53,7 +51,6 @@ class WeakMapTest extends DDSpecification {
   }
 
   //@Flaky("awaitGC usage is flaky")
-  @Retry
   def "Unreferenced keys get cleaned up"() {
     setup:
     def key = new Object()

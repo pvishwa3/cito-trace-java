@@ -2,7 +2,6 @@ import datadog.trace.agent.test.AgentTestRunner
 import datadog.trace.bootstrap.instrumentation.api.Tags
 import datadog.trace.test.util.Flaky
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
-import spock.lang.Retry
 import spock.lang.Shared
 import spring.hibernate.jpa.Customer
 import spring.hibernate.jpa.CustomerRepository
@@ -13,7 +12,6 @@ import spring.hibernate.jpa.PersistenceConfig
  * Unfortunately this test verifies that our hibernate instrumentation doesn't currently work with Spring Data Repositories.
  */
 @Flaky("https://github.com/DataDog/dd-trace-java/issues/4004")
-@Retry
 class SpringJpaTest extends AgentTestRunner {
 
   @Shared

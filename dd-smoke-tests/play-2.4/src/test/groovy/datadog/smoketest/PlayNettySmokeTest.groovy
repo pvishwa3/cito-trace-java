@@ -5,7 +5,6 @@ import datadog.trace.agent.test.utils.ThreadUtils
 import datadog.trace.test.util.Flaky
 import okhttp3.Request
 import spock.lang.AutoCleanup
-import spock.lang.Retry
 import spock.lang.Shared
 
 import java.nio.file.Files
@@ -16,7 +15,6 @@ import static datadog.trace.agent.test.server.http.TestHttpServer.httpServer
 import static java.util.concurrent.TimeUnit.SECONDS
 
 @Flaky("Fails sometimes when the TestHttp server returns a 'Not Found' https://github.com/DataDog/dd-trace-java/issues/3868")
-@Retry
 class PlayNettySmokeTest extends AbstractServerSmokeTest {
 
   @Shared
