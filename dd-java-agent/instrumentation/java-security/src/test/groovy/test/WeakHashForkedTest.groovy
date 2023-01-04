@@ -14,7 +14,6 @@ import static datadog.trace.agent.test.utils.TraceUtils.runUnderTrace
 class WeakHashForkedTest extends AgentTestRunner {
 
   def "unavailable hash algorithm"() {
-
     when:
     runUnderTrace("WeakHashingRootSpan") {
       new TestSuite().getMessageDigestInstance("SHA-XXX")
