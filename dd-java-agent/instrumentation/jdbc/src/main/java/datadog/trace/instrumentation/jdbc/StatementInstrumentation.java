@@ -5,8 +5,7 @@ import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.nameSta
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static datadog.trace.bootstrap.instrumentation.api.AgentTracer.activateSpan;
 import static datadog.trace.bootstrap.instrumentation.api.AgentTracer.startSpan;
-import static datadog.trace.instrumentation.jdbc.JDBCDecorator.DATABASE_QUERY;
-import static datadog.trace.instrumentation.jdbc.JDBCDecorator.DECORATE;
+import static datadog.trace.instrumentation.jdbc.JDBCDecorator.*;
 import static java.util.Collections.singletonMap;
 import static net.bytebuddy.matcher.ElementMatchers.isPublic;
 import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
@@ -17,6 +16,7 @@ import datadog.trace.bootstrap.CallDepthThreadLocalMap;
 import datadog.trace.bootstrap.InstrumentationContext;
 import datadog.trace.bootstrap.instrumentation.api.AgentScope;
 import datadog.trace.bootstrap.instrumentation.api.AgentSpan;
+import datadog.trace.bootstrap.instrumentation.api.Tags;
 import datadog.trace.bootstrap.instrumentation.jdbc.DBInfo;
 import datadog.trace.bootstrap.instrumentation.jdbc.DBQueryInfo;
 import java.sql.Connection;
@@ -65,10 +65,12 @@ public final class StatementInstrumentation extends Instrumenter.Tracing
   }
 
   public static class StatementAdvice {
-
+    // readOnly = true allows us to mutate the input sql statement. This may have a small impact on
+    // performance.
     @Advice.OnMethodEnter(suppress = Throwable.class)
     public static AgentScope onEnter(
-        @Advice.Argument(0) final String sql, @Advice.This final Statement statement) {
+        @Advice.Argument(value = 0, readOnly = false) final String sql,
+        @Advice.This final Statement statement) {
       // TODO consider matching known non-wrapper implementations to avoid this check
       final int callDepth = CallDepthThreadLocalMap.incrementCallDepth(Statement.class);
       if (callDepth > 0) {
@@ -80,7 +82,33 @@ public final class StatementInstrumentation extends Instrumenter.Tracing
         DECORATE.afterStart(span);
         DECORATE.onConnection(
             span, connection, InstrumentationContext.get(Connection.class, DBInfo.class));
-        DECORATE.onStatement(span, DBQueryInfo.ofStatement(sql));
+        String sqlStatement = sql;
+        if (DECORATE.injectSQLComment()) {
+          SQLCommenter commenter =
+              SQLCommenter.newBuilder()
+                  .withServiceName(span.getServiceName())
+                  .withDbInstance(String.valueOf(span.getTag(Tags.DB_INSTANCE)))
+                  .withServiceEnv(String.valueOf(span.getTag(Tags.DD_ENV)))
+                  .withServiceVersion(String.valueOf(span.getTag(Tags.DD_VERSION)))
+                  .build();
+          switch (SQL_COMMENT_INJECTION_MODE) {
+            case SQL_COMMENT_INJECTION_STATIC:
+              // TODO: change sql or statement? unclear.
+              sqlStatement = commenter.augmentSQLStatement(sql);
+              break;
+            case SQL_COMMENT_INJECTION_FULL:
+              commenter =
+                  SQLCommenter.newBuilder(commenter)
+                      .withTraceContext(
+                          span.getTraceId().toString(),
+                          String.valueOf(span.getSpanId()),
+                          span.getSamplingPriority())
+                      .build();
+              sqlStatement = commenter.augmentSQLStatement(sql);
+              break;
+          }
+        }
+        DECORATE.onStatement(span, DBQueryInfo.ofStatement(sqlStatement));
         return activateSpan(span);
       } catch (SQLException e) {
         // if we can't get the connection for any reason

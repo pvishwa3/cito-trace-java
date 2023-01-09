@@ -2496,6 +2496,11 @@ public class Config {
         Collections.singletonList(settingName), "", settingSuffix, defaultEnabled);
   }
 
+  public String getSqlCommentInjectionMode(final String integrationName, final String defaultMode) {
+    final String key = integrationName + ".sql.comment.injection.mode";
+    return configProvider.getString(key, defaultMode);
+  }
+
   private void logIgnoredSettingWarning(
       String setting, String overridingSetting, String overridingSuffix) {
     log.warn(

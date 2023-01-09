@@ -2,6 +2,7 @@ package datadog.trace.instrumentation.jdbc;
 
 import static datadog.trace.bootstrap.instrumentation.api.Tags.DB_OPERATION;
 
+import datadog.trace.api.Config;
 import datadog.trace.bootstrap.ContextStore;
 import datadog.trace.bootstrap.instrumentation.api.AgentSpan;
 import datadog.trace.bootstrap.instrumentation.api.InternalSpanTypes;
@@ -32,6 +33,13 @@ public class JDBCDecorator extends DatabaseClientDecorator<DBInfo> {
       UTF8BytesString.create("java-jdbc-statement");
   private static final UTF8BytesString JDBC_PREPARED_STATEMENT =
       UTF8BytesString.create("java-jdbc-prepared_statement");
+
+  public static final String SQL_COMMENT_INJECTION_DISABLED = "disabled";
+  public static final String SQL_COMMENT_INJECTION_STATIC = "service";
+  public static final String SQL_COMMENT_INJECTION_FULL = "full";
+
+  public static final String SQL_COMMENT_INJECTION_MODE =
+      Config.get().getSqlCommentInjectionMode("jdbc", SQL_COMMENT_INJECTION_DISABLED);
 
   public static void logMissingQueryInfo(Statement statement) throws SQLException {
     if (log.isDebugEnabled()) {
@@ -179,5 +187,10 @@ public class JDBCDecorator extends DatabaseClientDecorator<DBInfo> {
       span.setResourceName(DB_QUERY);
     }
     return span.setTag(Tags.COMPONENT, component);
+  }
+
+  /** For customers who elect to enable SQL comment injection */
+  public boolean injectSQLComment() {
+    return !SQL_COMMENT_INJECTION_MODE.equals(SQL_COMMENT_INJECTION_DISABLED);
   }
 }
