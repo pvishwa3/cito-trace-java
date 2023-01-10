@@ -3,7 +3,7 @@ package datadog.trace.api.gateway;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import datadog.trace.api.TraceSegment;
+import datadog.trace.api.internal.TraceSegment;
 import datadog.trace.api.function.TriConsumer;
 import datadog.trace.api.function.TriFunction;
 import datadog.trace.api.http.StoredBodySupplier;
