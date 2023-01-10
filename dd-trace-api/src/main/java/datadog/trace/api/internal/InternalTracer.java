@@ -16,4 +16,6 @@ public interface InternalTracer {
   void flush();
 
   void flushMetrics();
+
+  TraceSegment getTraceSegment();
 }
