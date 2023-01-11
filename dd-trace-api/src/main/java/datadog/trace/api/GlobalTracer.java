@@ -2,7 +2,6 @@ package datadog.trace.api;
 
 import datadog.trace.api.interceptor.TraceInterceptor;
 import datadog.trace.api.internal.InternalTracer;
-
 import java.util.ArrayList;
 import java.util.Collection;
 

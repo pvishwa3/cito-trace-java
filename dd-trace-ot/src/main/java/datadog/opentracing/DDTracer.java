@@ -500,7 +500,7 @@ public class DDTracer implements Tracer, datadog.trace.api.Tracer, InternalTrace
   public TraceSegment getTraceSegment() {
     SpanContext ctx = activeSpan().context();
     if (ctx instanceof DDSpanContext) {
-      return ((DDSpanContext)ctx).getTraceSegment();
+      return ((DDSpanContext) ctx).getTraceSegment();
     }
     return null;
   }
