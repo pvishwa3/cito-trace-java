@@ -13,14 +13,13 @@ public class EventTracker {
   }
 
   /**
-   * Method allowing to track whether a user login was successful or not. A user login event is made
-   * of a user id, along and an optional key-value map of metadata of string types only.
+   * Method for tracking successful login event. A user login event is made of a user id,
+   * and an optional key-value map of metadata of string types only.
    *
-   * @param userId user id used for login
-   * @param success flag indicates login success
-   * @param metadata custom metadata data represented as key/value map
+   * @param userId    user id used for login
+   * @param metadata  custom metadata data represented as key/value map
    */
-  public void trackLoginEvent(String userId, boolean success, Map<String, String> metadata) {
+  public void trackLoginSuccessEvent(String userId, Map<String, String> metadata) {
     if (tracer == null) {
       return;
     }
@@ -30,26 +29,41 @@ public class EventTracker {
       return;
     }
 
-    if (success) {
-      segment.setTagTop("appsec.events.users.login.success.track", true);
-      segment.setTagTop("usr.id", userId);
-      metadata.forEach(
-          (k, v) -> {
-            segment.setTagTop("appsec.events.users.login.success." + k, v);
-          });
-    } else {
-      segment.setTagTop("appsec.events.users.login.failure.track", true);
-      segment.setTagTop("appsec.events.users.login.failure.usr.id", userId);
-      metadata.forEach(
-          (k, v) -> {
-            segment.setTagTop("appsec.events.users.login.failure." + k, v);
-          });
-    }
+    segment.setTagTop("appsec.events.users.login.success.track", true);
+    segment.setTagTop("appsec.events.users.login.success", metadata);
+    segment.setTagTop("usr.id", userId);
     segment.setTagTop(DDTags.MANUAL_KEEP, true);
   }
 
+
   /**
-   * Method allowing to track custom events. A custom event is made of an event name along with an
+   * Method for tracking login failure event. A user login event is made of a user id,
+   * along user id existing flag and an optional key-value map of metadata of string types only.
+   *
+   * @param userId    user id used for login
+   * @param exists    flag indicates if provided userId exists
+   * @param metadata  custom metadata data represented as key/value map
+   */
+    public void trackLoginFailureEvent(String userId, boolean exists, Map<String, String> metadata) {
+    if (tracer == null) {
+      return;
+    }
+
+    TraceSegment segment = this.tracer.getTraceSegment();
+    if (segment == null) {
+      return;
+    }
+
+    segment.setTagTop("appsec.events.users.login.failure.track", true);
+    segment.setTagTop("appsec.events.users.login.failure.usr.id", userId);
+    segment.setTagTop("appsec.events.users.login.failure.usr.exists", exists);
+    segment.setTagTop("appsec.events.users.login.failure", metadata);
+    segment.setTagTop(DDTags.MANUAL_KEEP, true);
+  }
+
+
+  /**
+   * Method for tracking custom events. A custom event is made of an event name along with an
    * optional key-value map of metadata of string types only
    *
    * @param eventName name of the custom event
@@ -66,10 +80,7 @@ public class EventTracker {
     }
 
     segment.setTagTop("appsec.events." + eventName + ".track", true);
-    metadata.forEach(
-        (k, v) -> {
-          segment.setTagTop("appsec.events." + eventName + "." + k, v);
-        });
+    segment.setTagTop("appsec.events." + eventName, metadata);
     segment.setTagTop(DDTags.MANUAL_KEEP, true);
   }
 }
