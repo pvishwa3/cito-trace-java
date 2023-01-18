@@ -6,6 +6,7 @@ import datadog.trace.plugin.csi.util.MethodType
 import org.objectweb.asm.Type
 import spock.lang.Specification
 
+import javax.annotation.Nonnull
 import java.lang.reflect.Constructor
 import java.lang.reflect.Executable
 import java.lang.reflect.Method
@@ -81,8 +82,9 @@ abstract class BaseCsiPluginTest extends Specification {
     protected AdviceSpecification build(final MethodType advice,
                                         final Map<Integer, ParameterSpecification> parameters,
                                         final String signature,
-                                        final boolean invokeDynamic) {
-      return new BeforeSpecification(advice, parameters, signature, invokeDynamic)
+                                        final boolean invokeDynamic,
+                                        final Map<String, Map<String, String>> annotations) {
+      return new BeforeSpecification(advice, parameters, signature, invokeDynamic, annotations)
     }
   }
 
@@ -91,8 +93,9 @@ abstract class BaseCsiPluginTest extends Specification {
     protected AroundSpecification build(final MethodType advice,
                                         final Map<Integer, ParameterSpecification> parameters,
                                         final String signature,
-                                        final boolean invokeDynamic) {
-      return new AroundSpecification(advice, parameters, signature, invokeDynamic)
+                                        final boolean invokeDynamic,
+                                        final Map<String, Map<String, String>> annotations) {
+      return new AroundSpecification(advice, parameters, signature, invokeDynamic, annotations)
     }
   }
 
@@ -101,8 +104,9 @@ abstract class BaseCsiPluginTest extends Specification {
     protected AfterSpecification build(final MethodType advice,
                                        final Map<Integer, ParameterSpecification> parameters,
                                        final String signature,
-                                       final boolean invokeDynamic) {
-      return new AfterSpecification(advice, parameters, signature, invokeDynamic)
+                                       final boolean invokeDynamic,
+                                       final Map<String, Map<String, String>> annotations) {
+      return new AfterSpecification(advice, parameters, signature, invokeDynamic, annotations)
     }
   }
 
@@ -111,6 +115,7 @@ abstract class BaseCsiPluginTest extends Specification {
     protected Map<Integer, ParameterSpecification> parameters
     protected String signature
     protected boolean invokeDynamic
+    protected Map<String, Map<String, String>> annotations
 
     void advice(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = MethodTypeBuilder) final Closure body) {
       final spec = new MethodTypeBuilder()
@@ -136,8 +141,12 @@ abstract class BaseCsiPluginTest extends Specification {
       this.invokeDynamic = invokeDynamic
     }
 
+    void annotations(final Map<String, Map<String, String>> annotations) {
+      this.annotations = annotations
+    }
+
     <E extends AdviceSpecification> E build() {
-      final result = build(advice, parameters, signature, invokeDynamic) as E
+      final result = build(advice, parameters, signature, invokeDynamic, annotations) as E
       result.parseSignature(pointcutParser())
       return result
     }
@@ -146,7 +155,8 @@ abstract class BaseCsiPluginTest extends Specification {
     protected abstract AdviceSpecification build(final MethodType advice,
                                                  final Map<Integer, ParameterSpecification> parameters,
                                                  final String signature,
-                                                 final boolean invokeDynamic)
+                                                 final boolean invokeDynamic,
+                                                 final Map<String, Map<String, String>> annotations)
   }
 
   private static class MethodTypeBuilder {

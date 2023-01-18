@@ -4,8 +4,10 @@ import datadog.trace.agent.tooling.csi.CallSite;
 import datadog.trace.api.iast.IastAdvice;
 import datadog.trace.api.iast.InstrumentationBridge;
 import datadog.trace.api.iast.propagation.UrlModule;
+import datadog.trace.api.iast.telemetry.Propagation;
 import javax.annotation.Nullable;
 
+@Propagation
 @CallSite(spi = IastAdvice.class)
 public class URLDecoderCallSite {
 

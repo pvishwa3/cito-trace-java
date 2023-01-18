@@ -5,12 +5,15 @@ import datadog.trace.plugin.csi.util.ErrorCode
 import org.objectweb.asm.Type
 import datadog.trace.plugin.csi.impl.CallSiteSpecification.AdviceSpecification
 
+import static java.util.Collections.emptyMap
+import static java.util.Collections.emptySet
+
 class CallSiteSpecificationTest extends BaseCsiPluginTest {
 
   def 'test call site spi should be an interface'() {
     setup:
     final context = mockValidationContext()
-    final spec = new CallSiteSpecification(Type.getType(String), [Mock(AdviceSpecification)], Type.getType(String), -1, [] as Set<Type>)
+    final spec = new CallSiteSpecification(Type.getType(String), [Mock(AdviceSpecification)], Type.getType(String), -1, emptySet(), emptyMap())
 
     when:
     spec.validate(context)
@@ -22,7 +25,7 @@ class CallSiteSpecificationTest extends BaseCsiPluginTest {
   def 'test call site spi should not define any methods'() {
     setup:
     final context = mockValidationContext()
-    final spec = new CallSiteSpecification(Type.getType(String), [Mock(AdviceSpecification)], Type.getType(Comparable), -1, [] as Set<Type>)
+    final spec = new CallSiteSpecification(Type.getType(String), [Mock(AdviceSpecification)], Type.getType(Comparable), -1, emptySet(), emptyMap())
 
     when:
     spec.validate(context)
@@ -34,7 +37,7 @@ class CallSiteSpecificationTest extends BaseCsiPluginTest {
   def 'test call site should have advices'() {
     setup:
     final context = mockValidationContext()
-    final spec = new CallSiteSpecification(Type.getType(String), [], Type.getType(CallSiteAdvice), -1, [] as Set<Type>)
+    final spec = new CallSiteSpecification(Type.getType(String), [], Type.getType(CallSiteAdvice), -1, emptySet(), emptyMap())
 
     when:
     spec.validate(context)

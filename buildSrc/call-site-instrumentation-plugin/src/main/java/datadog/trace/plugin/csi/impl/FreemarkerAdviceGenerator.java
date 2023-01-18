@@ -26,6 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,13 +85,7 @@ public class FreemarkerAdviceGenerator implements AdviceGenerator {
                     spec.getClazz().getClassName(),
                     capitalize(advice.getAdvice().getMethodName()),
                     unique ? "" : i);
-            result.addAdvice(
-                generateAdviceJavaFile(
-                    spec.getSpi(),
-                    spec.getMinJavaVersion(),
-                    spec.getHelpers(),
-                    advice,
-                    classNameToType(className)));
+            result.addAdvice(generateAdviceJavaFile(spec, advice, classNameToType(className)));
           }
         }
       }
@@ -107,9 +102,7 @@ public class FreemarkerAdviceGenerator implements AdviceGenerator {
   }
 
   private AdviceResult generateAdviceJavaFile(
-      @Nonnull final Type spiClass,
-      final int minJavaVersion,
-      @Nonnull final Type[] helperClasses,
+      @Nonnull final CallSiteSpecification callSite,
       @Nonnull final AdviceSpecification spec,
       @Nonnull final Type adviceClass) {
     final File javaFile = new File(targetFolder, adviceClass.getInternalName() + ".java");
@@ -124,26 +117,42 @@ public class FreemarkerAdviceGenerator implements AdviceGenerator {
         return result;
       }
       final Map<String, Object> arguments = new HashMap<>();
-      arguments.put("spiPackageName", getPackageName(spiClass));
-      arguments.put("spiClassName", getClassName(spiClass, false));
-      arguments.put("minJavaVersion", getMinJavaVersion(minJavaVersion, spec));
+      arguments.put("spiPackageName", getPackageName(callSite.getSpi()));
+      arguments.put("spiClassName", getClassName(callSite.getSpi(), false));
+      arguments.put("minJavaVersion", getMinJavaVersion(callSite.getMinJavaVersion(), spec));
       arguments.put("packageName", getPackageName(adviceClass));
       arguments.put("className", getClassName(adviceClass));
       arguments.put("dynamicInvoke", spec.isInvokeDynamic());
       arguments.put("computeMaxStack", spec.isComputeMaxStack());
       boolean isInstanceMethod = !spec.isStaticPointcut();
       arguments.put("applyBody", getApplyMethodBody(spec, isInstanceMethod));
-      arguments.put("helperClassNames", getHelperClassNames(helperClasses));
+      arguments.put("helperClassNames", getHelperClassNames(callSite.getHelpers()));
       final MethodType pointcut = spec.getPointcut();
       arguments.put("type", pointcut.getOwner().getInternalName());
       arguments.put("method", pointcut.getMethodName());
       arguments.put("methodDescriptor", pointcut.getMethodType().getDescriptor());
+      final Map<String, Map<String, String>> annotations = getAnnotations(callSite, spec);
+      arguments.put("hasAnnotations", !annotations.isEmpty());
+      arguments.put("annotations", annotations);
       template.process(arguments, writer);
     } catch (Throwable e) {
       deleteFile(javaFile);
       handleThrowable(result, e);
     }
     return result;
+  }
+
+  private Map<String, Map<String, String>> getAnnotations(
+      final CallSiteSpecification callSite, final AdviceSpecification spec) {
+    if (!callSite.getAnnotations().isEmpty() && !spec.annotations.isEmpty()) {
+      Map<String, Map<String, String>> annotations = new HashMap<>(callSite.getAnnotations());
+      annotations.putAll(spec.getAnnotations());
+      return annotations;
+    } else if (!callSite.getAnnotations().isEmpty()) {
+      return callSite.getAnnotations();
+    } else {
+      return spec.getAnnotations().isEmpty() ? Collections.emptyMap() : spec.getAnnotations();
+    }
   }
 
   private int getMinJavaVersion(final int defaultMinJavaVersion, AdviceSpecification spec) {

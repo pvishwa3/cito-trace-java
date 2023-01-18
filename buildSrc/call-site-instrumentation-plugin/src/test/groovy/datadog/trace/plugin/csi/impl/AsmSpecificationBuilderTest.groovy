@@ -5,6 +5,7 @@ import datadog.trace.plugin.csi.impl.CallSiteSpecification.AdviceSpecification
 import datadog.trace.plugin.csi.impl.CallSiteSpecification.AfterSpecification
 import datadog.trace.plugin.csi.impl.CallSiteSpecification.AroundSpecification
 import datadog.trace.plugin.csi.impl.CallSiteSpecification.BeforeSpecification
+import datadog.trace.plugin.csi.impl.annotation.Source
 import org.objectweb.asm.Type
 
 import javax.servlet.ServletRequest
@@ -462,6 +463,55 @@ final class AsmSpecificationBuilderTest extends BaseCsiPluginTest {
     result.clazz.className == TestMinJavaVersion.name
     result.minJavaVersion == 9
   }
+
+  @Source("in_class")
+  @CallSite
+  static class TestCustomAnnotationsInClass {
+
+    @CallSite.After('java.lang.String javax.servlet.http.HttpServletRequest.getParameter(java.lang.String)')
+    static String after(@CallSite.This final ServletRequest request, @CallSite.Argument final String parameter, @CallSite.Return final String value) {
+      return value
+    }
+  }
+
+  def 'test specification builder with custom annotations in class'() {
+    setup:
+    final advice = fetchClass(TestCustomAnnotationsInClass)
+    final specificationBuilder = new AsmSpecificationBuilder()
+
+    when:
+    final result = specificationBuilder.build(advice).orElseThrow(RuntimeException::new)
+
+    then:
+    result.clazz.className == TestCustomAnnotationsInClass.name
+    result.annotations == [(Source.name) : [value: 'in_class'] ]
+  }
+
+  @CallSite
+  static class TestCustomAnnotationsInMethod {
+
+    @Source("in_method")
+    @CallSite.After('java.lang.String javax.servlet.http.HttpServletRequest.getParameter(java.lang.String)')
+    static String after(@CallSite.This final ServletRequest request, @CallSite.Argument final String parameter, @CallSite.Return final String value) {
+      return value
+    }
+  }
+
+  def 'test specification builder with custom annotations in method'() {
+    setup:
+    final advice = fetchClass(TestCustomAnnotationsInMethod)
+    final specificationBuilder = new AsmSpecificationBuilder()
+
+    when:
+    final result = specificationBuilder.build(advice).orElseThrow(RuntimeException::new)
+
+    then:
+    result.clazz.className == TestCustomAnnotationsInMethod.name
+    result.annotations == [:]
+    final afterAdvice = findAdvice(result, 'after')
+    afterAdvice.annotations == [(Source.name) : [value: 'in_method'] ]
+  }
+
 
   protected static List<Integer> getArguments(final AdviceSpecification advice) {
     return advice.arguments.map(it -> it.index).collect(Collectors.toList())

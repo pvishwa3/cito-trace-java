@@ -51,6 +51,7 @@ class IastSystemTest extends DDSpecification {
     then:
     1 * iastContext.getTaintedObjects()
     1 * traceSegment.setTagTop('_dd.iast.enabled', 1)
+    1 * iastContext.getTelemetryCollector()
     0 * _
     noExceptionThrown()
   }

@@ -1,11 +1,15 @@
 package datadog.trace.plugin.csi.impl
 
 import com.github.javaparser.JavaParser
+import com.github.javaparser.ast.body.AnnotationDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.body.TypeDeclaration
+import com.github.javaparser.ast.expr.MemberValuePair
+import com.github.javaparser.ast.expr.NormalAnnotationExpr
 import datadog.trace.agent.tooling.csi.CallSite
 import datadog.trace.plugin.csi.AdviceGenerator.AdviceResult
 import datadog.trace.plugin.csi.AdviceGenerator.CallSiteResult
+import datadog.trace.plugin.csi.impl.annotation.Propagation
 import spock.lang.Requires
 import spock.lang.TempDir
 
@@ -458,6 +462,36 @@ final class FreemarkerAdviceGeneratorTest extends BaseCsiPluginTest {
     ]
   }
 
+  @CallSite
+  class AdviceWithAnnotations {
+    @Propagation(key = 'request_parameter_key', value = 'request_parameter_value')
+    @CallSite.After('java.util.Map javax.servlet.ServletRequest.getParameterMap()')
+    static Map after(@CallSite.This final ServletRequest request, @CallSite.Return final Map parameters) {
+      return parameters
+    }
+  }
+
+  def 'test advice with annotations'() {
+    setup:
+    final spec = buildClassSpecification(AdviceWithAnnotations)
+    final generator = buildFreemarkerAdviceGenerator(buildDir)
+
+    when:
+    final result = generator.generate(spec)
+
+    then:
+    assertNoErrors(result)
+    final advice = findAdvice(result, 'after' )
+    final javaFile = new JavaParser().parse(advice.file).getResult().get()
+    final adviceClass = javaFile.getType(0)
+    adviceClass.name.asString().endsWith(AdviceWithAnnotations.simpleName + 'After')
+    final annotations = groupAnnotations(adviceClass)
+    final propagationAnnotation = annotations[Propagation.name] as NormalAnnotationExpr
+    final fields = groupPairs(propagationAnnotation)
+    fields['key'].value.toString() == '"request_parameter_key"'
+    fields['value'].value.toString() == '"request_parameter_value"'
+  }
+
   private static List<String> getStatements(final MethodDeclaration method) {
     return method.body.get().statements.collect { it.toString() }
   }
@@ -466,8 +500,18 @@ final class FreemarkerAdviceGeneratorTest extends BaseCsiPluginTest {
     return new FreemarkerAdviceGenerator(targetFolder, pointcutParser())
   }
 
+  private static Map<String, AnnotationDeclaration> groupAnnotations(final TypeDeclaration<?> classNode) {
+    return classNode.annotations.groupBy { it.nameAsString }
+      .collectEntries { key, value -> [key, value.get(0)] }
+  }
+
   private static Map<String, MethodDeclaration> groupMethods(final TypeDeclaration<?> classNode) {
     return classNode.methods.groupBy { it.name.asString() }
+      .collectEntries { key, value -> [key, value.get(0)] }
+  }
+
+  private static Map<String, MemberValuePair> groupPairs(final NormalAnnotationExpr annotation) {
+    return annotation.pairs.groupBy { it.nameAsString }
       .collectEntries { key, value -> [key, value.get(0)] }
   }
 

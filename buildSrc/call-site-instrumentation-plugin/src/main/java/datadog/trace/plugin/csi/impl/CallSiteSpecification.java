@@ -32,18 +32,21 @@ public class CallSiteSpecification implements Validatable {
   private final Type spi;
   private final int minJavaVersion;
   private final Type[] helpers;
+  private final Map<String, Map<String, String>> annotations;
 
   public CallSiteSpecification(
       @Nonnull final Type clazz,
       @Nonnull final List<AdviceSpecification> advices,
       @Nonnull final Type spi,
       final int minJavaVersion,
-      @Nonnull final Set<Type> helpers) {
+      @Nonnull final Set<Type> helpers,
+      @Nonnull Map<String, Map<String, String>> annotations) {
     this.clazz = clazz;
     this.advices = advices;
     this.spi = spi;
     this.minJavaVersion = minJavaVersion;
     this.helpers = helpers.toArray(new Type[0]);
+    this.annotations = annotations;
   }
 
   @Override
@@ -88,6 +91,10 @@ public class CallSiteSpecification implements Validatable {
     return advices.stream();
   }
 
+  public Map<String, Map<String, String>> getAnnotations() {
+    return annotations;
+  }
+
   /**
    * Description of a method annotated with {@link datadog.trace.agent.tooling.csi.CallSite.After},
    * {@link datadog.trace.agent.tooling.csi.CallSite.Before} or {@link
@@ -101,16 +108,19 @@ public class CallSiteSpecification implements Validatable {
     protected final boolean invokeDynamic;
     protected MethodType pointcut;
     protected Executable pointcutMethod;
+    protected final Map<String, Map<String, String>> annotations;
 
     public AdviceSpecification(
         @Nonnull final MethodType advice,
         @Nonnull final Map<Integer, ParameterSpecification> parameters,
         @Nonnull final String signature,
-        final boolean invokeDynamic) {
+        final boolean invokeDynamic,
+        @Nonnull final Map<String, Map<String, String>> annotations) {
       this.advice = advice;
       this.parameters = new TreeMap<>(parameters);
       this.signature = signature;
       this.invokeDynamic = invokeDynamic;
+      this.annotations = annotations;
     }
 
     @Override
@@ -481,6 +491,10 @@ public class CallSiteSpecification implements Validatable {
     public boolean isComputeMaxStack() {
       return !(this instanceof AroundSpecification);
     }
+
+    public Map<String, Map<String, String>> getAnnotations() {
+      return annotations;
+    }
   }
 
   public static final class BeforeSpecification extends AdviceSpecification {
@@ -488,8 +502,9 @@ public class CallSiteSpecification implements Validatable {
         @Nonnull final MethodType advice,
         @Nonnull final Map<Integer, ParameterSpecification> parameters,
         @Nonnull final String signature,
-        final boolean invokeDynamic) {
-      super(advice, parameters, signature, invokeDynamic);
+        final boolean invokeDynamic,
+        @Nonnull final Map<String, Map<String, String>> annotations) {
+      super(advice, parameters, signature, invokeDynamic, annotations);
     }
 
     @Override
@@ -517,8 +532,9 @@ public class CallSiteSpecification implements Validatable {
         @Nonnull final MethodType advice,
         @Nonnull final Map<Integer, ParameterSpecification> parameters,
         @Nonnull final String signature,
-        final boolean invokeDynamic) {
-      super(advice, parameters, signature, invokeDynamic);
+        final boolean invokeDynamic,
+        @Nonnull final Map<String, Map<String, String>> annotations) {
+      super(advice, parameters, signature, invokeDynamic, annotations);
     }
 
     @Override
@@ -551,8 +567,9 @@ public class CallSiteSpecification implements Validatable {
         @Nonnull final MethodType advice,
         @Nonnull final Map<Integer, ParameterSpecification> parameters,
         @Nonnull final String signature,
-        final boolean invokeDynamic) {
-      super(advice, parameters, signature, invokeDynamic);
+        final boolean invokeDynamic,
+        @Nonnull final Map<String, Map<String, String>> annotations) {
+      super(advice, parameters, signature, invokeDynamic, annotations);
     }
 
     @Override

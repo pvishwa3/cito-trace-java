@@ -6,6 +6,10 @@ public interface CallSiteAdvice {
 
   Pointcut pointcut();
 
+  default CallSiteAdvice unwrap() {
+    return this;
+  }
+
   interface HasHelpers {
     String[] helperClassNames();
   }

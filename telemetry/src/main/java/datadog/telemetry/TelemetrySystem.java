@@ -4,6 +4,7 @@ import datadog.communication.ddagent.SharedCommunicationObjects;
 import datadog.telemetry.dependency.DependencyPeriodicAction;
 import datadog.telemetry.dependency.DependencyService;
 import datadog.telemetry.dependency.DependencyServiceImpl;
+import datadog.telemetry.iast.IastTelemetryPeriodicAction;
 import datadog.telemetry.integration.IntegrationPeriodicAction;
 import datadog.trace.api.Config;
 import datadog.trace.api.time.SystemTimeSource;
@@ -42,7 +43,9 @@ public class TelemetrySystem {
             okHttpClient,
             telemetryService,
             Arrays.asList(
-                new DependencyPeriodicAction(dependencyService), new IntegrationPeriodicAction()));
+                new DependencyPeriodicAction(dependencyService),
+                new IntegrationPeriodicAction(),
+                new IastTelemetryPeriodicAction()));
     return AgentThreadFactory.newAgentThread(
         AgentThreadFactory.AgentThread.TELEMETRY, telemetryRunnable);
   }

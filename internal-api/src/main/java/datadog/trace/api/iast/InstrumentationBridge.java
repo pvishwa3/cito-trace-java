@@ -2,7 +2,12 @@ package datadog.trace.api.iast;
 
 import datadog.trace.api.iast.propagation.StringModule;
 import datadog.trace.api.iast.propagation.UrlModule;
-import datadog.trace.api.iast.sink.*;
+import datadog.trace.api.iast.sink.CommandInjectionModule;
+import datadog.trace.api.iast.sink.LdapInjectionModule;
+import datadog.trace.api.iast.sink.PathTraversalModule;
+import datadog.trace.api.iast.sink.SqlInjectionModule;
+import datadog.trace.api.iast.sink.WeakCipherModule;
+import datadog.trace.api.iast.sink.WeakHashModule;
 import datadog.trace.api.iast.source.WebModule;
 
 /** Bridge between instrumentations and {@link IastModule} instances. */

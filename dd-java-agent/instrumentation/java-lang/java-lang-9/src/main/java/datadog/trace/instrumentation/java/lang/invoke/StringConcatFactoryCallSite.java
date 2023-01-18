@@ -7,6 +7,7 @@ import datadog.trace.agent.tooling.csi.CallSite;
 import datadog.trace.api.iast.IastAdvice;
 import datadog.trace.api.iast.InstrumentationBridge;
 import datadog.trace.api.iast.propagation.StringModule;
+import datadog.trace.api.iast.telemetry.Propagation;
 import de.thetaphi.forbiddenapis.SuppressForbidden;
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressForbidden
+@Propagation
 @CallSite(spi = IastAdvice.class, minJavaVersion = 9)
 public class StringConcatFactoryCallSite {
 

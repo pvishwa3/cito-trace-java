@@ -77,6 +77,7 @@ public class AsmSpecificationBuilder implements SpecificationBuilder {
     private boolean isCallSite;
     private final List<AdviceSpecification> advices = new ArrayList<>();
     private final Set<Type> helpers = new HashSet<>();
+    private final Map<String, Map<String, String>> annotations = new HashMap<>();
     private Type spi = classNameToType(CALL_SITE_ADVICE_CLASS); // default annotation value
     private int minJavaVersion = -1;
     private CallSiteSpecification result;
@@ -125,7 +126,8 @@ public class AsmSpecificationBuilder implements SpecificationBuilder {
           }
         };
       }
-      return null;
+
+      return DatadogAnnotationVisitor.forType(descriptor, annotations);
     }
 
     @Override
@@ -144,7 +146,8 @@ public class AsmSpecificationBuilder implements SpecificationBuilder {
     @Override
     public void visitEnd() {
       if (isCallSite) {
-        result = new CallSiteSpecification(clazz, advices, spi, minJavaVersion, helpers);
+        result =
+            new CallSiteSpecification(clazz, advices, spi, minJavaVersion, helpers, annotations);
       }
     }
 
@@ -184,6 +187,7 @@ public class AsmSpecificationBuilder implements SpecificationBuilder {
     private final Map<Integer, ParameterSpecification> parameters = new HashMap<>();
     private final List<String> signatures = new ArrayList<>();
     private boolean inokeDynamic;
+    private final Map<String, Map<String, String>> annotations = new HashMap<>();
     private AdviceSpecificationCtor adviceCtor;
 
     public AdviceMethodVisitor(
@@ -227,7 +231,7 @@ public class AsmSpecificationBuilder implements SpecificationBuilder {
           }
         };
       }
-      return null;
+      return DatadogAnnotationVisitor.forType(descriptor, annotations);
     }
 
     @Override
@@ -267,9 +271,69 @@ public class AsmSpecificationBuilder implements SpecificationBuilder {
     public void visitEnd() {
       if (adviceCtor != null) {
         signatures.stream()
-            .map(sig -> adviceCtor.build(advice, parameters, sig, inokeDynamic))
+            .map(sig -> adviceCtor.build(advice, parameters, sig, inokeDynamic, annotations))
             .forEach(spec.advices::add);
       }
+    }
+  }
+
+  /** TODO deal with other annotation types than strings */
+  private static class DatadogAnnotationVisitor extends AnnotationVisitor {
+    private final String annotationClass;
+    private final Map<String, String> properties;
+
+    DatadogAnnotationVisitor(
+        @Nonnull final String annotationClass, @Nonnull final Map<String, String> properties) {
+      super(ASM_API_VERSION);
+      this.annotationClass = annotationClass;
+      this.properties = properties;
+    }
+
+    @Override
+    public void visit(final String key, final Object value) {
+      if (value instanceof String) {
+        properties.put(key, (String) value);
+      } else {
+        throw new UnsupportedOperationException(
+            String.format(
+                "Only String field allowed for annotations: @%s(%s=%s)",
+                annotationClass, key, value));
+      }
+    }
+
+    @Override
+    public void visitEnum(final String name, final String descriptor, final String value) {
+      throw new UnsupportedOperationException(
+          String.format(
+              "Only String field allowed for annotations: @%s(%s=%s)",
+              annotationClass, name, descriptor));
+    }
+
+    @Override
+    public AnnotationVisitor visitAnnotation(final String name, final String descriptor) {
+      throw new UnsupportedOperationException(
+          String.format(
+              "Only String field allowed for annotations: @%s(%s=%s)",
+              annotationClass, name, descriptor));
+    }
+
+    @Override
+    public AnnotationVisitor visitArray(final String name) {
+      throw new UnsupportedOperationException(
+          String.format(
+              "Only String field allowed for annotations: @%s(%s=Array)", annotationClass, name));
+    }
+
+    public static AnnotationVisitor forType(
+        final String typeDescriptor, final Map<String, Map<String, String>> annotations) {
+      final Type type = Type.getType(typeDescriptor);
+      if (type.getClassName().startsWith("datadog")) {
+        final Map<String, String> properties = new HashMap<>();
+        final String annotationClass = type.getClassName();
+        annotations.put(annotationClass, properties);
+        return new DatadogAnnotationVisitor(annotationClass, properties);
+      }
+      return null;
     }
   }
 
@@ -279,7 +343,8 @@ public class AsmSpecificationBuilder implements SpecificationBuilder {
         @Nonnull MethodType advice,
         @Nonnull Map<Integer, ParameterSpecification> parameters,
         @Nonnull String signature,
-        boolean invokeDynamic);
+        boolean invokeDynamic,
+        @Nonnull Map<String, Map<String, String>> annotations);
   }
 
   @FunctionalInterface

@@ -15,7 +15,7 @@ class IastModuleImplOnStringTrimTest extends IastModuleImplTestBase {
 
 
   def setup() {
-    module = registerDependencies(new StringModuleImpl())
+    module = new StringModuleImpl()
   }
 
   void 'make sure IastRequestContext is called'() {

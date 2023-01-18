@@ -31,7 +31,7 @@ public class Advices {
 
   public static final Advices EMPTY =
       new Advices(
-          Collections.<String, Map<String, Map<String, CallSiteAdvice>>>emptyMap(),
+          Collections.emptyMap(),
           new String[0],
           0,
           AdviceIntrospector.NoOpAdviceInstrospector.INSTANCE) {
@@ -85,8 +85,9 @@ public class Advices {
   }
 
   private static boolean applyAdvice(final CallSiteAdvice advice) {
-    if (advice instanceof CallSiteAdvice.HasMinJavaVersion) {
-      final int minJavaVersion = ((CallSiteAdvice.HasMinJavaVersion) advice).minJavaVersion();
+    final CallSiteAdvice unwrapped = advice.unwrap();
+    if (unwrapped instanceof CallSiteAdvice.HasMinJavaVersion) {
+      final int minJavaVersion = ((CallSiteAdvice.HasMinJavaVersion) unwrapped).minJavaVersion();
       return Platform.isJavaVersionAtLeast(minJavaVersion);
     }
     return true;
@@ -114,14 +115,15 @@ public class Advices {
               "Advice %s and %s match the same pointcut, this is not yet supported",
               oldAdvice, advice));
     }
-    if (advice instanceof CallSiteAdvice.HasHelpers) {
-      final String[] helperClassNames = ((CallSiteAdvice.HasHelpers) advice).helperClassNames();
+    final CallSiteAdvice unwraped = advice.unwrap();
+    if (unwraped instanceof CallSiteAdvice.HasHelpers) {
+      final String[] helperClassNames = ((CallSiteAdvice.HasHelpers) unwraped).helperClassNames();
       if (helperClassNames != null) {
         Collections.addAll(helpers, helperClassNames);
       }
     }
-    return advice instanceof CallSiteAdvice.HasFlags
-        ? ((CallSiteAdvice.HasFlags) advice).flags()
+    return unwraped instanceof CallSiteAdvice.HasFlags
+        ? ((CallSiteAdvice.HasFlags) unwraped).flags()
         : 0;
   }
 

@@ -21,6 +21,10 @@ public interface TaintedObjects {
 
   void release();
 
+  long getEstimatedSize();
+
+  boolean isFlat();
+
   static TaintedObjects build() {
     final TaintedObjectsImpl taintedObjects = new TaintedObjectsImpl();
     return IastSystem.DEBUG ? new TaintedObjectsDebugAdapter(taintedObjects) : taintedObjects;
@@ -56,6 +60,16 @@ public interface TaintedObjects {
     }
 
     public void release() {}
+
+    @Override
+    public long getEstimatedSize() {
+      return map.getEstimatedSize();
+    }
+
+    @Override
+    public boolean isFlat() {
+      return map.isFlat();
+    }
   }
 
   class TaintedObjectsDebugAdapter implements TaintedObjects {
@@ -98,6 +112,16 @@ public interface TaintedObjects {
           LOGGER.error("Failed to debug tainted objects release", e);
         }
       }
+    }
+
+    @Override
+    public long getEstimatedSize() {
+      return delegated.getEstimatedSize();
+    }
+
+    @Override
+    public boolean isFlat() {
+      return delegated.isFlat();
     }
 
     private void logTainted(final TaintedObject tainted) {

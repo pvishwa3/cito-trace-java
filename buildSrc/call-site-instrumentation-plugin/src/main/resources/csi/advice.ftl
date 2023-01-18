@@ -1,3 +1,18 @@
+<#-- @ftlvariable name="packageName" type="java.lang.String" -->
+<#-- @ftlvariable name="className" type="java.lang.String" -->
+<#-- @ftlvariable name="spiPackageName" type="java.lang.String" -->
+<#-- @ftlvariable name="spiClassName" type="java.lang.String" -->
+<#-- @ftlvariable name="helperClassNames" type="java.util.Set<java.util.String>" -->
+<#-- @ftlvariable name="minJavaVersion" type="int" -->
+<#-- @ftlvariable name="dynamicInvoke" type="boolean" -->
+<#-- @ftlvariable name="type" type="java.lang.String" -->
+<#-- @ftlvariable name="method" type="java.lang.String" -->
+<#-- @ftlvariable name="methodDescriptor" type="java.lang.String" -->
+<#-- @ftlvariable name="applyBody" type="java.lang.String" -->
+<#-- @ftlvariable name="computeMaxStack" type="boolean" -->
+<#-- @ftlvariable name="hasAnnotations" type="boolean" -->
+<#-- @ftlvariable name="annotations" type="java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>" -->
+
 <#if packageName??>package ${packageName};
 <#assign customSpiPackage = spiPackageName?? && spiPackageName != packageName>
 <#else>
@@ -14,6 +29,12 @@ import net.bytebuddy.jar.asm.Opcodes;
 import com.google.auto.service.AutoService;
 <#if customSpiPackage>import ${spiPackageName}.${spiClassName};</#if>
 
+<#if hasAnnotations>
+  <#list annotations?keys as annotation>
+    <#assign fields = annotations[annotation]>
+@${annotation}(<#list fields?keys as field>${field} = "${fields[field]}"<#if field?has_next>, </#if></#list>)
+  </#list>
+</#if>
 @AutoService(${spiClassName}.class)
 public final class ${className} implements CallSiteAdvice, Pointcut, <#if dynamicInvoke>InvokeDynamicAdvice<#else>InvokeAdvice</#if><#if computeMaxStack>, CallSiteAdvice.HasFlags</#if><#if hasHelpers>, CallSiteAdvice.HasHelpers</#if><#if hasMinJavaVersion>, CallSiteAdvice.HasMinJavaVersion</#if><#if customSpiClass>, ${spiClassName}</#if> {
 

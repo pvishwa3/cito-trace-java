@@ -2,6 +2,7 @@ package datadog.trace.agent.tooling.csi
 
 import datadog.trace.agent.tooling.bytebuddy.csi.Advices
 import datadog.trace.agent.tooling.bytebuddy.csi.CallSiteInstrumentation
+import datadog.trace.agent.tooling.bytebuddy.csi.CallSiteSupplier
 import datadog.trace.agent.tooling.bytebuddy.csi.CallSiteTransformer
 import datadog.trace.test.util.DDSpecification
 import net.bytebuddy.agent.builder.AgentBuilder
@@ -15,8 +16,6 @@ import net.bytebuddy.utility.JavaModule
 import net.bytebuddy.utility.nullability.MaybeNull
 import datadog.trace.agent.tooling.csi.CallSiteAdvice.HasHelpers
 import datadog.trace.agent.tooling.csi.CallSiteAdvice.HasFlags
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import java.security.MessageDigest
 
@@ -31,18 +30,17 @@ import static net.bytebuddy.matcher.ElementMatchers.named
 
 class BaseCallSiteTest extends DDSpecification {
 
-  protected static final Logger LOG = LoggerFactory.getLogger(CallSiteTransformerInvokeDynamicTest)
-
-
   protected InvokeAdvice mockInvokeAdvice(final Pointcut target) {
     return Mock(InvokeAdvice) {
       pointcut() >> target
+      unwrap() >> it
     }
   }
 
   protected InvokeDynamicAdvice mockInvokeDynamicAdvice(final Pointcut target) {
     return Mock(InvokeDynamicAdvice) {
       pointcut() >> target
+      unwrap() >> it
     }
   }
 
@@ -50,6 +48,7 @@ class BaseCallSiteTest extends DDSpecification {
     return Mock(InvokeAdviceWithFlags) {
       pointcut() >> target
       flags() >> flagsValue
+      unwrap() >> it
     }
   }
 
@@ -57,6 +56,7 @@ class BaseCallSiteTest extends DDSpecification {
     return Mock(InvokeDynamicAdviceWithFlags) {
       pointcut() >> target
       flags() >> flagsValue
+      unwrap() >> it
     }
   }
 
@@ -64,6 +64,7 @@ class BaseCallSiteTest extends DDSpecification {
     return Mock(InvokeAdviceWithHelpers) {
       pointcut() >> target
       helperClassNames() >> helpers
+      unwrap() >> it
     }
   }
 
@@ -71,6 +72,7 @@ class BaseCallSiteTest extends DDSpecification {
     return Mock(InvokeDynamicAdviceWithHelpers) {
       pointcut() >> target
       helperClassNames() >> helpers
+      unwrap() >> it
     }
   }
 
@@ -79,6 +81,7 @@ class BaseCallSiteTest extends DDSpecification {
       pointcut() >> target
       flags() >> flagsValue
       helperClassNames() >> helpers
+      unwrap() >> it
     }
   }
 
@@ -87,6 +90,7 @@ class BaseCallSiteTest extends DDSpecification {
       pointcut() >> target
       flags() >> flagsValue
       helperClassNames() >> helpers
+      unwrap() >> it
     }
   }
 
@@ -164,20 +168,33 @@ class BaseCallSiteTest extends DDSpecification {
 
   protected static CallSiteInstrumentation buildInstrumentation(final Iterable<CallSiteAdvice> advices,
     final ElementMatcher<TypeDescription> callerType = any()) {
-    return new CallSiteInstrumentation(advices, 'csi') {
+    return new CallSiteInstrumentation('csi') {
         @Override
         ElementMatcher<TypeDescription> callerType() {
           return callerType
+        }
+
+        @Override
+        protected CallSiteSupplier callSites() {
+          return { advices }
         }
       }
   }
 
   protected static CallSiteInstrumentation buildInstrumentation(final Class<?> spiClass,
     final ElementMatcher<TypeDescription> callerType = any()) {
-    return new CallSiteInstrumentation(spiClass, 'csi') {
+    return new CallSiteInstrumentation('csi') {
         @Override
         ElementMatcher<TypeDescription> callerType() {
           return callerType
+        }
+
+        @Override
+        protected CallSiteSupplier callSites() {
+          return {
+            final targetClassLoader = CallSiteInstrumentation.classLoader
+            return (ServiceLoader<CallSiteAdvice>) ServiceLoader.load(spiClass, targetClassLoader)
+          }
         }
       }
   }

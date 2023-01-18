@@ -20,7 +20,7 @@ class StringModuleTest extends IastModuleImplTestBase {
   private List<Object> objectHolder
 
   def setup() {
-    module = registerDependencies(new StringModuleImpl())
+    module = new StringModuleImpl()
     objectHolder = []
   }
 
