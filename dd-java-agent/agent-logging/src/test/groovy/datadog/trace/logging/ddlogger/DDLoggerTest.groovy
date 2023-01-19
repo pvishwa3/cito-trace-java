@@ -391,6 +391,7 @@ class DDLoggerTest extends LogValidatingSpecification {
     logger.trace(DDLogger.SEND_TELEMETRY, "trace regular message")
     logger.info(DDLogger.SEND_TELEMETRY, "info regular message")
     logger.warn(DDLogger.SEND_TELEMETRY, "warn regular message")
+    logger.error(DDLogger.SEND_TELEMETRY, "error message")
 
     try {
       throw new IOException("wrong")
