@@ -377,9 +377,11 @@ public class DDLogger implements Logger {
       Object arg1,
       Object arg2,
       Object[] args) {
-    if (LogCollector.get().getEnabled()) {
+    if (LogCollector.get().isEnabled()) {
       if (null != t || marker == DDLogger.SEND_TELEMETRY) {
-        if (level == LogLevel.WARN || level == LogLevel.ERROR || level == LogLevel.DEBUG) {
+        if (level == LogLevel.WARN
+            || level == LogLevel.ERROR
+            || (level == LogLevel.DEBUG && LogCollector.get().isDebugEnabled())) {
           LogCollector.get().addLogEntry(msg, level.toString(), t, format, arg1, arg2, args);
         }
       }

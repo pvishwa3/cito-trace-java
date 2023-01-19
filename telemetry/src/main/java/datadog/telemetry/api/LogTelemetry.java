@@ -31,37 +31,9 @@ public class LogTelemetry {
   @com.squareup.moshi.Json(name = "debug")
   private boolean debug;
 
-  /**
-   * Get apiVersion
-   *
-   * @return apiVersion
-   */
-  public ApiVersion getApiVersion() {
-    return apiVersion;
-  }
-
-  /** Set apiVersion */
-  public void setApiVersion(ApiVersion apiVersion) {
-    this.apiVersion = apiVersion;
-  }
-
   public LogTelemetry apiVersion(ApiVersion apiVersion) {
     this.apiVersion = apiVersion;
     return this;
-  }
-
-  /**
-   * Get application
-   *
-   * @return application
-   */
-  public Application getApplication() {
-    return application;
-  }
-
-  /** Set application */
-  public void setApplication(Application application) {
-    this.application = application;
   }
 
   public LogTelemetry application(Application application) {
@@ -69,37 +41,9 @@ public class LogTelemetry {
     return this;
   }
 
-  /**
-   * Get host
-   *
-   * @return host
-   */
-  public Host getHost() {
-    return host;
-  }
-
-  /** Set host */
-  public void setHost(Host host) {
-    this.host = host;
-  }
-
   public LogTelemetry host(Host host) {
     this.host = host;
     return this;
-  }
-
-  /**
-   * Get runtimeId
-   *
-   * @return runtimeId
-   */
-  public String getRuntimeId() {
-    return runtimeId;
-  }
-
-  /** Set runtimeId */
-  public void setRuntimeId(String runtimeId) {
-    this.runtimeId = runtimeId;
   }
 
   public LogTelemetry runtimeId(String runtimeId) {
@@ -107,37 +51,9 @@ public class LogTelemetry {
     return this;
   }
 
-  /**
-   * Get seqId
-   *
-   * @return seqId
-   */
-  public Long getSeqId() {
-    return seqId;
-  }
-
-  /** Set seqId */
-  public void setSeqId(Long seqId) {
-    this.seqId = seqId;
-  }
-
   public LogTelemetry seqId(Long seqId) {
     this.seqId = seqId;
     return this;
-  }
-
-  /**
-   * Get tracerTime
-   *
-   * @return tracerTime
-   */
-  public Long getTracerTime() {
-    return tracerTime;
-  }
-
-  /** Set tracerTime */
-  public void setTracerTime(Long tracerTime) {
-    this.tracerTime = tracerTime;
   }
 
   public LogTelemetry tracerTime(Long tracerTime) {
@@ -145,56 +61,14 @@ public class LogTelemetry {
     return this;
   }
 
-  /**
-   * Get requestType
-   *
-   * @return requestType
-   */
-  public RequestType getRequestType() {
-    return requestType;
-  }
-
-  /** Set requestType */
-  public void setRequestType(RequestType requestType) {
-    this.requestType = requestType;
-  }
-
   public LogTelemetry requestType(RequestType requestType) {
     this.requestType = requestType;
     return this;
   }
 
-  /**
-   * Get debug
-   *
-   * @return debug
-   */
-  public boolean getDebug() {
-    return debug;
-  }
-
-  /** Set apiVersion */
-  public void setDebug(boolean debug) {
-    this.debug = debug;
-  }
-
   public LogTelemetry debug(boolean debug) {
     this.debug = debug;
     return this;
-  }
-
-  /**
-   * Get payload
-   *
-   * @return payload
-   */
-  public List<TelemetryLogEntry> getPayload() {
-    return payload;
-  }
-
-  /** Set payload */
-  public void setPayload(List<TelemetryLogEntry> payload) {
-    this.payload = payload;
   }
 
   public LogTelemetry payload(List<TelemetryLogEntry> payload) {

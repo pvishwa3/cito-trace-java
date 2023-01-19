@@ -11,6 +11,7 @@ public class LogCollector {
   public static final int MAX_ENTRIES = 10000;
   private static int overflowedEntryCount = 0;
   private static boolean enabled = false;
+  public static boolean debugEnabled = false;
   private static LinkedHashSet<TelemetryLogEntry> logEntries = new LinkedHashSet<>();
   private static String[] packageList = {"datadog.", "com.datadog.", "java.", "javax."};
   private static final String RET = "\r\n";
@@ -27,8 +28,16 @@ public class LogCollector {
     this.enabled = enabled;
   }
 
-  public boolean getEnabled() {
+  public void setDebugEnabled(boolean enabled) {
+    debugEnabled = enabled;
+  }
+
+  public boolean isEnabled() {
     return enabled;
+  }
+
+  public boolean isDebugEnabled() {
+    return debugEnabled;
   }
 
   public synchronized void addLogEntry(

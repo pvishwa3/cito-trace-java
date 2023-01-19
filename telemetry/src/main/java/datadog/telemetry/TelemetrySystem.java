@@ -53,27 +53,18 @@ public class TelemetrySystem {
 
   public static void startTelemetry(
       Instrumentation instrumentation, SharedCommunicationObjects sco) {
-    try {
-      DependencyService dependencyService = createDependencyService(instrumentation);
-      RequestBuilder requestBuilder = new RequestBuilder(sco.agentUrl);
-      TelemetryService telemetryService =
-          new TelemetryServiceImpl(
-              new RequestBuilderSupplier(sco.agentUrl),
-              SystemTimeSource.INSTANCE,
-              Config.get().getTelemetryHeartbeatInterval());
-      TELEMETRY_THREAD =
-          createTelemetryRunnable(telemetryService, sco.okHttpClient, dependencyService);
-      TELEMETRY_THREAD.start();
-      LogCollector.get().setEnabled(Config.get().isTelemetryDebugEnabled());
-    } catch (UnsatisfiedLinkError e) {
-      // TODO: update jnr_ffi and jnr_unixsocket to version that supports aarch64
-      final String arch = System.getProperty("os.arch").toLowerCase();
-      if (!arch.equals("x86") && !arch.equals("amd64")) {
-        log.error("Can't start telemetry. Unsupported architecture: '{}'", arch);
-      } else {
-        throw e;
-      }
-    }
+    DependencyService dependencyService = createDependencyService(instrumentation);
+    RequestBuilder requestBuilder = new RequestBuilder(sco.agentUrl);
+    TelemetryService telemetryService =
+        new TelemetryServiceImpl(
+            new RequestBuilderSupplier(sco.agentUrl),
+            SystemTimeSource.INSTANCE,
+            Config.get().getTelemetryHeartbeatInterval());
+    TELEMETRY_THREAD =
+        createTelemetryRunnable(telemetryService, sco.okHttpClient, dependencyService);
+    LogCollector.get().setEnabled(Config.get().isTelemetryLogCollectionEnabled());
+    LogCollector.get().setDebugEnabled(Config.get().isTelemetryDebugEnabled());
+    TELEMETRY_THREAD.start();
   }
 
   public static void stop() {

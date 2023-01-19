@@ -20,7 +20,7 @@ class LogFilteringTest extends DDSpecification{
     setup:
 
     when:
-    logger.debug("Debug message", new Exception("Exception message"))
+    logger.error("Debug message", new Exception("Exception message"))
     def stackTrace = LogCollector.get().drain().get(0).getStackTrace()
     String[] stackTraceLines = stackTrace.split("\r\n")
 
@@ -38,7 +38,7 @@ class LogFilteringTest extends DDSpecification{
       ExceptionHelper.throwExceptionFromDatadogCode("Exception Message")
     }
     catch (Exception e){
-      logger.debug("Debug message", e)
+      logger.error("Debug message", e)
     }
     def stackTrace = LogCollector.get().drain().get(0).getStackTrace()
     String[] stackTraceLines = stackTrace.split("\r\n")

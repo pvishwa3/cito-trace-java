@@ -14,4 +14,12 @@ public class ExceptionHelper {
         || callSpec.startsWith("com.datadog.")
         || callSpec.startsWith("javax.");
   }
+
+  public static Exception createException(String msg) {
+    try {
+      throw new Exception(msg);
+    } catch (Exception e) {
+      return e;
+    }
+  }
 }

@@ -28,7 +28,7 @@ class TelemetryLogTest extends DDSpecification {
 
   void 'test static binder'(){
     when:
-    logger.debug("Exception Message", new Exception("Exception Message"))
+    logger.error("Exception Message", new Exception("Exception Message"))
     periodicAction.doIteration(telemetryService)
 
     then:
@@ -42,7 +42,7 @@ class TelemetryLogTest extends DDSpecification {
   void 'test marker debugging'(){
     when:
 
-    logger.debug(DDLogger.SEND_TELEMETRY, "Debug Message")
+    logger.warn(DDLogger.SEND_TELEMETRY, "Debug Message")
     periodicAction.doIteration(telemetryService)
 
     then:
@@ -54,7 +54,7 @@ class TelemetryLogTest extends DDSpecification {
 
   void 'test debugging with no marker'(){
     when:
-    logger.debug("Debug Message")
+    logger.warn("Debug Message")
     periodicAction.doIteration(telemetryService)
 
     then:
@@ -67,7 +67,7 @@ class TelemetryLogTest extends DDSpecification {
 
     when:
     for (int i=0; i< LogCollector.MAX_ENTRIES + 10; i++){
-      logger.debug(DDLogger.SEND_TELEMETRY, "Debug Message " + i)
+      logger.warn(DDLogger.SEND_TELEMETRY, "Debug Message " + i)
     }
     entries = LogCollector.get().drain()
 
@@ -83,10 +83,10 @@ class TelemetryLogTest extends DDSpecification {
 
     when:
     for (int i=0; i< LogCollector.MAX_ENTRIES + 10; i++){
-      logger.debug(DDLogger.SEND_TELEMETRY, "Debug Message 1")
+      logger.warn(DDLogger.SEND_TELEMETRY, "Debug Message 1")
     }
     for (int i=0; i< LogCollector.MAX_ENTRIES + 10; i++){
-      logger.debug(DDLogger.SEND_TELEMETRY, "Debug Message 2")
+      logger.warn(DDLogger.SEND_TELEMETRY, "Debug Message 2")
     }
     entries = LogCollector.get().drain()
 
