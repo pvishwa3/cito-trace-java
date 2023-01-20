@@ -31,7 +31,7 @@ class LogCollectorTest  extends Specification {
     messageList.size() == LogCollector.MAX_ENTRIES + 1
     messageList.get(0).getMessage() == "msg"
     !messageList.get(0).getStackTrace().contains("Exception Message 2")
-    messageList.get(1).getMessage() == null
+    messageList.get(1).getMessage() == "here {} are"
     messageList.get(1).getLevel() == "DEBUG"
     messageList.get(3).getMessage() == "[A, B, C]"
     messageList.get(3).getStackTrace().contains("Exception Message")
