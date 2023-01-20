@@ -590,7 +590,7 @@ public class DDSpanContext implements AgentSpan.Context, RequestContext, TraceSe
           new Metadata(
               threadId,
               threadName,
-              postProcessor.processTags(flatTags(unsafeTags)),
+              postProcessor.processTags(unsafeTags),
               baggageItemsWithDatadogTags,
               samplingPriority != PrioritySampling.UNSET ? samplingPriority : getSamplingPriority(),
               measured,
@@ -702,50 +702,5 @@ public class DDSpanContext implements AgentSpan.Context, RequestContext, TraceSe
   private DDSpanContext getTopContext() {
     DDSpan span = trace.getRootSpan();
     return null != span ? span.context() : this;
-  }
-
-  /**
-   * Method transform map of maps into flat map of tags
-   *
-   * Example:
-   *    "root": {
-   *        "key1": "val1"
-   *        "key2": {
-   *            "sub1": "val2",
-   *            "sub2": "val3"
-   *        }
-   *    }
-   *    "plain": "123"
-   *
-   * Result:
-   *    "root.key1"       ->  "val1"
-   *    "root.key2.sub1"  ->  "val2"
-   *    "root.key2.sub2"  ->  "val3"
-   *    "plain"           ->  "123"
-   *
-   * @param tags    map of tags that can contain sub-maps as values
-   * @return        flat map, after transformation
-   */
-  private Map<String, Object> flatTags(Map<String, Object> tags) {
-    Map<String, Object> extractedTags = new HashMap<>();
-    tags.entrySet().removeIf(entry -> extractValues(entry.getKey(), entry.getValue(), extractedTags));
-    tags.putAll(extractedTags);
-    return tags;
-  }
-
-  private boolean extractValues(String key, Object value, Map<String, Object> resultMap) {
-    if (value instanceof Map) {
-      for (Map.Entry<String, Object> entry : ((Map<String, Object>)value).entrySet()) {
-        String newKey = key + '.' + entry.getKey();
-        Object newValue = entry.getValue();
-        if (newValue instanceof Map) {
-          extractValues(newKey, newValue, resultMap);
-        } else {
-          resultMap.put(newKey, newValue);
-        }
-      }
-      return true;
-    }
-    return false;
   }
 }
