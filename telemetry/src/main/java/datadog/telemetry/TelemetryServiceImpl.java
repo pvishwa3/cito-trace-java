@@ -38,7 +38,7 @@ public class TelemetryServiceImpl implements TelemetryService {
   private final BlockingQueue<Dependency> dependencies = new LinkedBlockingQueue<>();
   private final BlockingQueue<Metric> metrics =
       new LinkedBlockingQueue<>(1024); // recommended capacity?
-  private final BlockingQueue<TelemetryLogEntry> logEntries = new LinkedBlockingQueue<>();
+  private final BlockingQueue<TelemetryLogEntry> logEntries = new LinkedBlockingQueue<>(1024);
 
   private final Queue<Request> queue = new ArrayBlockingQueue<>(16);
 

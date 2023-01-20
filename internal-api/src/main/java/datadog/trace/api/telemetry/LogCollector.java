@@ -67,8 +67,14 @@ public class LogCollector {
     }
     if (null != msg) {
       log.setMessage(msg);
-    } else if (isDDCode && null != format) {
-      log.setMessage(MessageFormatter.arrayFormat(format, args).getMessage());
+    } else {
+      if (null != format) {
+        if (isDDCode) {
+          log.setMessage(MessageFormatter.arrayFormat(format, args).getMessage());
+        } else {
+          log.setMessage(format);
+        }
+      }
     }
     log.setLevel(level);
     logEntries.add(log);
